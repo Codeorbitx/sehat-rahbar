@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Hide Alpine components until Alpine initializes (e.g. the offline banner). */
+[x-cloak] {
+    display: none !important;
+}

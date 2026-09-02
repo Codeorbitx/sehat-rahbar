@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Http;
 use App\Models\Patient;
 use App\Models\Screening;
 use App\Models\TriageResult;
@@ -19,6 +21,9 @@ class ScreeningController extends Controller
         $validated = $request->validate([
             'bp_systolic' => 'nullable|integer',
             'bp_diastolic' => 'nullable|integer',
+            'blood_sugar' => 'nullable|numeric',
+            'body_temp' => 'nullable|numeric',
+            'heart_rate' => 'nullable|integer',
             'swelling' => 'boolean',
             'severe_headache' => 'boolean',
             'vision_issues' => 'boolean',
@@ -33,15 +38,63 @@ class ScreeningController extends Controller
 
         [$priority, $reasons] = $this->calculateTriage($validated);
 
-        TriageResult::create([
+        $triageResult = TriageResult::create([
             'screening_id' => $screening->id,
             'priority_level' => $priority,
             'reasons' => $reasons,
         ]);
 
-        return redirect()->route('patients.create')->with('success', "Screening saved. Priority: {$priority}");
-    }
+        $this->attachMlPrediction($triageResult, $patient, $validated);
 
+        return redirect()->route('screenings.result', $screening->id);
+    }
+    public function result(Screening $screening)
+{
+    $screening->load('patient', 'triageResult');
+    return view('screenings.result', compact('screening'));
+}
+
+    /**
+     * Attach the ML risk prediction to the triage result as a supporting signal.
+     * Skips silently (leaving ml_risk_level null) when any input is missing or
+     * the ML service is unreachable, so the screening save is never affected.
+     */
+    private function attachMlPrediction(TriageResult $triageResult, Patient $patient, array $data): void
+    {
+        $features = [
+            'age' => $patient->age,
+            'systolic_bp' => $data['bp_systolic'] ?? null,
+            'diastolic_bp' => $data['bp_diastolic'] ?? null,
+            'blood_sugar' => $data['blood_sugar'] ?? null,
+            'body_temp' => $data['body_temp'] ?? null,
+            'heart_rate' => $data['heart_rate'] ?? null,
+        ];
+
+        if (in_array(null, $features, true)) {
+            return;
+        }
+
+        try {
+            $response = Http::timeout(5)->post('http://127.0.0.1:5000/predict', $features);
+        } catch (ConnectionException) {
+            return;
+        }
+
+        if (! $response->successful()) {
+            return;
+        }
+
+        $riskLevel = $response->json('risk_level');
+
+        if ($riskLevel === null) {
+            return;
+        }
+
+        $triageResult->update([
+            'ml_risk_level' => $riskLevel,
+            'ml_confidence' => $response->json('confidence'),
+        ]);
+    }
     private function calculateTriage($data)
     {
         $reasons = [];

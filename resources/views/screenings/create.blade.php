@@ -23,6 +23,24 @@
                         </div>
                     </div>
 
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Blood Sugar</label>
+                            <input type="number" step="0.01" name="blood_sugar"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Body Temp</label>
+                            <input type="number" step="0.01" name="body_temp"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Heart Rate</label>
+                            <input type="number" name="heart_rate"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
+                        </div>
+                    </div>
+
                     <div class="space-y-2 pt-2">
                         <label class="flex items-center gap-2">
                             <input type="checkbox" name="swelling" value="1" class="rounded text-emerald-600 focus:ring-emerald-600">

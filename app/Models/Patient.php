@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Patient extends Model
 {
-    protected $fillable = ['name', 'age', 'gestational_age_weeks', 'contact_number', 'registered_by'];
+    protected $fillable = ['name', 'age', 'gestational_age_weeks', 'contact_number', 'registered_by', 'patient_code'];
 
 public function screenings()
 {

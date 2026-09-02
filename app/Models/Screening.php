@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Screening extends Model
 {
-    protected $fillable = ['patient_id', 'lhw_id', 'bp_systolic', 'bp_diastolic', 'glucose_level', 'hemoglobin_level', 'swelling', 'severe_headache', 'vision_issues', 'low_fetal_movement', 'other_symptoms'];
+    protected $fillable = ['patient_id', 'lhw_id', 'bp_systolic', 'bp_diastolic', 'blood_sugar', 'body_temp', 'heart_rate', 'glucose_level', 'hemoglobin_level', 'swelling', 'severe_headache', 'vision_issues', 'low_fetal_movement', 'other_symptoms'];
 
 public function patient()
 {
