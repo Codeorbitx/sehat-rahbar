@@ -75,7 +75,7 @@ class ScreeningController extends Controller
         }
 
         try {
-            $response = Http::timeout(5)->post('http://127.0.0.1:5000/predict', $features);
+            $response = Http::timeout(5)->post(config('services.ml_api_url') . '/predict', $features);
         } catch (ConnectionException) {
             return;
         }

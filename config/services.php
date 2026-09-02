@@ -35,4 +35,6 @@ return [
         ],
     ],
 
+    'ml_api_url' => env('ML_API_URL', 'http://127.0.0.1:5000'),
+
 ];
