@@ -55,6 +55,7 @@ RUN php artisan storage:link || true
 
 EXPOSE 8080
 
-# Run package:discover at startup so it picks up the real .env injected by
-# Render, then start the application server.
-CMD ["sh", "-c", "php artisan package:discover --ansi && php artisan serve --host=0.0.0.0 --port=8080"]
+# Do NOT run config:cache or optimize at build time — they bake env values
+# into cached files before Render injects runtime environment variables.
+# Laravel reads fresh .env / env vars on every request by default.
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
