@@ -33,7 +33,7 @@ WORKDIR /var/www
 
 # Copy project files
 COPY . .
-
+RUN rm -f bootstrap/cache/config.php
 # Provide a dummy .env so artisan commands can bootstrap during build
 RUN cp .env.example .env
 
@@ -55,7 +55,6 @@ RUN php artisan storage:link || true
 
 EXPOSE 8080
 
-# Do NOT run config:cache or optimize at build time — they bake env values
-# into cached files before Render injects runtime environment variables.
-# Laravel reads fresh .env / env vars on every request by default.
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
+# Shell form (not exec form) so both commands run through sh.
+# The APP_KEY check will appear in Render deploy logs for debugging.
+CMD php -r "echo 'APP_KEY is: ' . (getenv('APP_KEY') ? 'SET' : 'NOT SET') . PHP_EOL;" && php artisan serve --host=0.0.0.0 --port=8080
