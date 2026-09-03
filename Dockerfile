@@ -35,7 +35,7 @@ WORKDIR /var/www
 COPY . .
 RUN rm -f bootstrap/cache/config.php
 # Provide a dummy .env so artisan commands can bootstrap during build
-RUN cp .env.example .env
+# RUN cp .env.example .env
 
 # Install PHP dependencies (--no-scripts prevents package:discover from running
 # before a valid environment/database is available)
@@ -51,10 +51,11 @@ RUN mkdir -p storage/app/public storage/framework/cache/data storage/framework/s
     && chmod -R 775 storage bootstrap/cache
 
 # Link storage (safe to run during build; only creates a symlink)
-RUN php artisan storage:link || true
+# RUN php artisan storage:link || true
 
 EXPOSE 8080
 
 # Shell form (not exec form) so both commands run through sh.
 # The APP_KEY check will appear in Render deploy logs for debugging.
-CMD php -r "echo 'APP_KEY is: ' . (getenv('APP_KEY') ? 'SET' : 'NOT SET') . PHP_EOL;" && php artisan serve --host=0.0.0.0 --port=8080
+# CMD php -r "echo 'APP_KEY is: ' . (getenv('APP_KEY') ? 'SET' : 'NOT SET') . PHP_EOL;" && php artisan serve --host=0.0.0.0 --port=8080
+CMD php -r "if (!getenv('APP_KEY')) { die('ERROR: APP_KEY is NOT SET in Render environment' . PHP_EOL); } echo 'APP_KEY is SET' . PHP_EOL;" && php artisan config:clear && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=8080
