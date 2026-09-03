@@ -34,8 +34,12 @@ WORKDIR /var/www
 # Copy project files
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Provide a dummy .env so artisan commands can bootstrap during build
+RUN cp .env.example .env
+
+# Install PHP dependencies (--no-scripts prevents package:discover from running
+# before a valid environment/database is available)
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
 # Install and build frontend assets
 RUN npm install && npm run build
@@ -46,9 +50,11 @@ RUN mkdir -p storage/app/public storage/framework/cache/data storage/framework/s
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Link storage
+# Link storage (safe to run during build; only creates a symlink)
 RUN php artisan storage:link || true
 
 EXPOSE 8080
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
+# Run package:discover at startup so it picks up the real .env injected by
+# Render, then start the application server.
+CMD ["sh", "-c", "php artisan package:discover --ansi && php artisan serve --host=0.0.0.0 --port=8080"]
