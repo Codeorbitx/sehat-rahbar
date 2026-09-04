@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ur" dir="ltr">
+<html lang="{{ app()->getLocale() === 'ur' ? 'ur' : 'en' }}" dir="ltr">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -31,6 +31,7 @@
 
         <div class="min-h-screen flex flex-col">
             @include('layouts.navigation')
+            @include('layouts.partials.breadcrumb')
 
             <!-- Page Heading -->
             @isset($header)

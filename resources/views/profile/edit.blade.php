@@ -10,7 +10,7 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card scroll-mt-24" id="settings">
             <div class="card-body">
                 @include('profile.partials.update-password-form')
             </div>

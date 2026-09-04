@@ -1,130 +1,270 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-200 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <!-- Left side: Logo -->
-            <div class="flex items-center">
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
-                    <img src="{{ asset('images/logo.png') }}" alt="Sehat Rahbar" class="h-9 w-9 object-contain">
-                    <span class="hidden sm:inline text-base font-bold text-navy-900" translate="no">{{ config('app.name', 'Sehat Rahbar') }}</span>
-                </a>
-            </div>
+@php
+    $user = Auth::user();
 
-            <!-- Desktop Nav Links -->
-            <div class="hidden sm:flex sm:items-center sm:gap-1">
-                <a href="{{ route('dashboard') }}"
-                   class="px-3 py-2 rounded-lg text-sm font-medium transition
-                          {{ request()->routeIs('dashboard') ? 'bg-brand-50 text-brand-800' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' }}">
+    // Two-letter initials (e.g. "Laiba Gul" -> "LG"), UTF-8 safe for Urdu names.
+    $nameParts = preg_split('/\s+/u', trim((string) $user->name)) ?: [];
+    $initials = mb_strtoupper(
+        mb_substr($nameParts[0] ?? '', 0, 1, 'UTF-8').
+        ($nameParts[1] ?? '' ? mb_substr($nameParts[1], 0, 1, 'UTF-8') : ''),
+        'UTF-8'
+    );
+
+    $locale = app()->getLocale();
+
+    // Active-state detection shared by the desktop links and the mobile panel.
+    $isDashboard  = request()->routeIs('dashboard*');
+    $isPatients   = request()->routeIs('patients.index', 'patients.show', 'screenings.*', 'referrals.*');
+    $isNewPatient = request()->routeIs('patients.create');
+
+    // Shared class strings (kept identical across desktop/mobile for consistency).
+    $navLink  = 'inline-flex items-center gap-1.5 border-b-2 px-3 text-sm font-medium transition-colors duration-200';
+    $navActive = 'border-brand-700 text-brand-800';
+    $navIdle   = 'border-transparent text-gray-600 hover:border-gray-300 hover:text-gray-900';
+
+    $menuItem = 'flex w-full items-center gap-2.5 px-4 py-2 text-start text-sm font-medium text-gray-700 transition-colors duration-150 hover:bg-brand-50 hover:text-brand-800';
+
+    $mobileLink = 'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150';
+@endphp
+
+<div x-data="{ open: false, scrolled: false }"
+     x-init="scrolled = window.pageYOffset > 4"
+     @scroll.window.passive="scrolled = window.pageYOffset > 4"
+     @keydown.escape.window="open = false"
+     x-effect="document.body.style.overflow = open ? 'hidden' : ''">
+
+    <nav class="sticky top-0 z-50 border-b border-gray-200 bg-white transition-[background-color,box-shadow,backdrop-filter] duration-300"
+         :class="scrolled ? 'bg-white/90 shadow-sm backdrop-blur-md' : ''">
+
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between gap-3">
+
+                <!-- Left: brand + primary navigation -->
+                <div class="flex min-w-0 items-center gap-7">
+                    <a href="{{ route('dashboard') }}" class="flex shrink-0 items-center gap-2.5" aria-label="{{ config('app.name', 'Sehat Rahbar') }}">
+                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'Sehat Rahbar') }}" class="h-9 w-9 object-contain">
+                        <span class="hidden text-base font-bold leading-none text-navy-900 sm:block" translate="no">{{ config('app.name', 'Sehat Rahbar') }}</span>
+                    </a>
+
+                    <!-- Desktop nav links -->
+                    <div class="hidden items-stretch self-stretch lg:flex">
+                        <a href="{{ route('dashboard') }}" class="{{ $navLink }} {{ $isDashboard ? $navActive : $navIdle }}">
+                            <x-icon name="dashboard" class="h-4 w-4 shrink-0"/>
+                            {{ __('Dashboard') }}
+                        </a>
+                        <a href="{{ route('patients.index') }}" class="{{ $navLink }} {{ $isPatients ? $navActive : $navIdle }}">
+                            <x-icon name="users" class="h-4 w-4 shrink-0"/>
+                            {{ __('Patients') }}
+                        </a>
+                        <a href="{{ route('patients.create') }}" class="{{ $navLink }} {{ $isNewPatient ? $navActive : $navIdle }}">
+                            <x-icon name="user-plus" class="h-4 w-4 shrink-0"/>
+                            {{ __('New Patient') }}
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right: quick action + user menu + hamburger -->
+                <div class="flex shrink-0 items-center gap-2 sm:gap-3">
+                    <!-- New screening (desktop / tablet) -->
+                    <a href="{{ route('patients.create') }}" title="{{ __('New Screening') }}"
+                       class="hidden items-center gap-1.5 rounded-lg bg-health-700 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-health-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-health-500 sm:inline-flex">
+                        <x-icon name="plus" class="h-4 w-4"/>
+                        <span>{{ __('New Screening') }}</span>
+                    </a>
+
+                    <!-- New screening — icon-only on very small screens -->
+                    <a href="{{ route('patients.create') }}" title="{{ __('New Screening') }}" aria-label="{{ __('New Screening') }}"
+                       class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-health-700 text-white shadow-sm transition-colors duration-200 hover:bg-health-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-health-500 sm:hidden">
+                        <x-icon name="plus" class="h-4 w-4"/>
+                    </a>
+
+                    <!-- User dropdown -->
+                    <x-dropdown align="right" width="56">
+                        <x-slot name="trigger">
+                            <button type="button" aria-haspopup="menu"
+                                    class="flex items-center gap-2.5 rounded-full p-1 pe-2 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">
+                                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-800">{{ $initials }}</span>
+                                <span class="hidden max-w-[10rem] truncate md:block">{{ $user->name }}</span>
+                                <x-icon name="chevron-down" class="hidden h-4 w-4 text-gray-400 md:block"/>
+                            </button>
+                        </x-slot>
+
+                        <x-slot name="content">
+                            <!-- Signed-in user -->
+                            <div class="flex items-center gap-3 border-b border-gray-100 px-4 py-3">
+                                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-800">{{ $initials }}</span>
+                                <div class="min-w-0">
+                                    <p class="truncate text-sm font-semibold text-gray-800">{{ $user->name }}</p>
+                                    <p class="truncate text-xs text-gray-500">{{ $user->email }}</p>
+                                </div>
+                            </div>
+
+                            <div class="py-1.5">
+                                <a href="{{ route('profile.edit') }}" class="{{ $menuItem }}">
+                                    <x-icon name="user" class="h-4 w-4 shrink-0 text-gray-400"/>
+                                    {{ __('My Profile') }}
+                                </a>
+                                <a href="{{ route('profile.edit') }}#settings" class="{{ $menuItem }}">
+                                    <x-icon name="settings" class="h-4 w-4 shrink-0 text-gray-400"/>
+                                    {{ __('Settings') }}
+                                </a>
+                            </div>
+
+                            <!-- Language switch -->
+                            <div class="border-t border-gray-100 py-1.5">
+                                <p class="px-4 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-400">{{ __('Language') }}</p>
+                                <a href="{{ route('locale.switch', 'ur') }}" class="{{ $menuItem }} justify-between">
+                                    <span class="flex items-center gap-2.5">
+                                        <x-icon name="languages" class="h-4 w-4 shrink-0 text-gray-400"/>
+                                        <span translate="no">اردو</span>
+                                    </span>
+                                    @if ($locale === 'ur')
+                                        <x-icon name="check" class="h-4 w-4 text-brand-700"/>
+                                    @endif
+                                </a>
+                                <a href="{{ route('locale.switch', 'en') }}" class="{{ $menuItem }} justify-between">
+                                    <span class="flex items-center gap-2.5">
+                                        <x-icon name="languages" class="h-4 w-4 shrink-0 text-gray-400"/>
+                                        <span translate="no">English</span>
+                                    </span>
+                                    @if ($locale === 'en')
+                                        <x-icon name="check" class="h-4 w-4 text-brand-700"/>
+                                    @endif
+                                </a>
+                            </div>
+
+                            <!-- Logout -->
+                            <div class="border-t border-gray-100 py-1.5">
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit"
+                                            class="flex w-full items-center gap-2.5 px-4 py-2 text-start text-sm font-medium text-danger-600 transition-colors duration-150 hover:bg-danger-50 hover:text-danger-700">
+                                        <x-icon name="logout" class="h-4 w-4 shrink-0"/>
+                                        {{ __('Log Out') }}
+                                    </button>
+                                </form>
+                            </div>
+                        </x-slot>
+                    </x-dropdown>
+
+                    <!-- Hamburger (mobile / tablet) -->
+                    <button type="button" @click="open = true" :aria-expanded="open ? 'true' : 'false'" aria-label="{{ __('Menu') }}"
+                            class="rounded-lg p-2 text-gray-500 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 lg:hidden">
+                        <x-icon name="menu" class="h-6 w-6"/>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile menu: backdrop -->
+    <div x-cloak x-show="open" x-transition.opacity.duration.200ms
+         class="fixed inset-0 z-[55] bg-gray-900/40 lg:hidden" aria-hidden="true"
+         @click="open = false"></div>
+
+    <!-- Mobile menu: slide-in panel -->
+    <aside x-cloak x-show="open"
+           x-transition:enter="transition ease-out duration-300"
+           x-transition:enter-start="ltr:translate-x-full rtl:-translate-x-full"
+           x-transition:enter-end="translate-x-0"
+           x-transition:leave="transition ease-in duration-200"
+           x-transition:leave-start="translate-x-0"
+           x-transition:leave-end="ltr:translate-x-full rtl:-translate-x-full"
+           class="fixed inset-y-0 end-0 z-[56] flex w-72 max-w-[85vw] flex-col bg-white shadow-2xl lg:hidden"
+           role="dialog" aria-modal="true" aria-label="{{ __('Menu') }}">
+
+        <!-- Panel header -->
+        <div class="flex h-16 shrink-0 items-center justify-between border-b border-gray-100 px-4">
+            <a href="{{ route('dashboard') }}" @click="open = false" class="flex items-center gap-2.5">
+                <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'Sehat Rahbar') }}" class="h-8 w-8 object-contain">
+                <span class="text-sm font-bold leading-none text-navy-900" translate="no">{{ config('app.name', 'Sehat Rahbar') }}</span>
+            </a>
+            <button type="button" @click="open = false" aria-label="{{ __('Close menu') }}"
+                    class="rounded-lg p-2 text-gray-500 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">
+                <x-icon name="close" class="h-5 w-5"/>
+            </button>
+        </div>
+
+        <!-- Panel body -->
+        <div class="flex-1 overflow-y-auto px-3 py-4">
+            <div class="space-y-1">
+                <a href="{{ route('dashboard') }}" @click="open = false"
+                   class="{{ $mobileLink }} {{ $isDashboard ? 'bg-brand-50 text-brand-800' : 'text-gray-700 hover:bg-gray-100' }}">
+                    <x-icon name="dashboard" class="h-5 w-5 shrink-0"/>
                     {{ __('Dashboard') }}
                 </a>
-                <a href="{{ route('patients.index') }}"
-                   class="px-3 py-2 rounded-lg text-sm font-medium transition
-                          {{ request()->routeIs('patients.index') ? 'bg-brand-50 text-brand-800' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' }}">
+                <a href="{{ route('patients.index') }}" @click="open = false"
+                   class="{{ $mobileLink }} {{ $isPatients ? 'bg-brand-50 text-brand-800' : 'text-gray-700 hover:bg-gray-100' }}">
+                    <x-icon name="users" class="h-5 w-5 shrink-0"/>
                     {{ __('Patients') }}
                 </a>
-                <a href="{{ route('patients.create') }}"
-                   class="px-3 py-2 rounded-lg text-sm font-medium transition
-                          {{ request()->routeIs('patients.create') ? 'bg-brand-50 text-brand-800' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' }}">
+                <a href="{{ route('patients.create') }}" @click="open = false"
+                   class="{{ $mobileLink }} {{ $isNewPatient ? 'bg-brand-50 text-brand-800' : 'text-gray-700 hover:bg-gray-100' }}">
+                    <x-icon name="user-plus" class="h-5 w-5 shrink-0"/>
                     {{ __('New Patient') }}
                 </a>
             </div>
 
-            <!-- Right side: User dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:gap-3">
-                <!-- Quick action -->
-                <a href="{{ route('patients.create') }}"
-                   class="btn-success text-xs px-3 py-1.5 rounded-lg">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    {{ __('New Screening') }}
+            <a href="{{ route('patients.create') }}" @click="open = false"
+               class="mt-4 flex items-center justify-center gap-2 rounded-lg bg-health-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-health-800">
+                <x-icon name="plus" class="h-4 w-4"/>
+                {{ __('New Screening') }}
+            </a>
+
+            <div class="mt-5 space-y-1 border-t border-gray-100 pt-4">
+                <a href="{{ route('profile.edit') }}" @click="open = false"
+                   class="{{ $mobileLink }} {{ request()->routeIs('profile.edit') ? 'bg-brand-50 text-brand-800' : 'text-gray-700 hover:bg-gray-100' }}">
+                    <x-icon name="user" class="h-5 w-5 shrink-0"/>
+                    {{ __('My Profile') }}
                 </a>
-
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 focus:outline-none transition px-2 py-1.5 rounded-lg hover:bg-gray-100">
-                            <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-800 flex items-center justify-center text-xs font-bold">
-                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                            </div>
-                            <span class="hidden md:inline">{{ Auth::user()->name }}</span>
-                            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <div class="px-4 py-3 border-b border-gray-100">
-                            <p class="text-sm font-medium text-gray-800">{{ Auth::user()->name }}</p>
-                            <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
-                        </div>
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
+                <a href="{{ route('profile.edit') }}#settings" @click="open = false"
+                   class="{{ $mobileLink }} text-gray-700 hover:bg-gray-100">
+                    <x-icon name="settings" class="h-5 w-5 shrink-0"/>
+                    {{ __('Settings') }}
+                </a>
             </div>
 
-            <!-- Mobile hamburger -->
-            <div class="flex items-center sm:hidden">
-                <button @click="open = ! open" class="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none transition">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
+            <div class="mt-5 border-t border-gray-100 pt-4">
+                <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">{{ __('Language') }}</p>
+                <a href="{{ route('locale.switch', 'ur') }}" @click="open = false"
+                   class="{{ $mobileLink }} justify-between {{ $locale === 'ur' ? 'bg-brand-50 text-brand-800' : 'text-gray-700 hover:bg-gray-100' }}">
+                    <span class="flex items-center gap-3">
+                        <x-icon name="languages" class="h-5 w-5 shrink-0"/>
+                        <span translate="no">اردو</span>
+                    </span>
+                    @if ($locale === 'ur')
+                        <x-icon name="check" class="h-4 w-4"/>
+                    @endif
+                </a>
+                <a href="{{ route('locale.switch', 'en') }}" @click="open = false"
+                   class="{{ $mobileLink }} justify-between {{ $locale === 'en' ? 'bg-brand-50 text-brand-800' : 'text-gray-700 hover:bg-gray-100' }}">
+                    <span class="flex items-center gap-3">
+                        <x-icon name="languages" class="h-5 w-5 shrink-0"/>
+                        <span translate="no">English</span>
+                    </span>
+                    @if ($locale === 'en')
+                        <x-icon name="check" class="h-4 w-4"/>
+                    @endif
+                </a>
             </div>
         </div>
-    </div>
 
-    <!-- Mobile menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden border-t border-gray-200 bg-white">
-        <div class="px-4 py-3 space-y-1">
-            <a href="{{ route('dashboard') }}"
-               class="block px-3 py-2.5 rounded-lg text-base font-medium transition
-                      {{ request()->routeIs('dashboard') ? 'bg-brand-50 text-brand-800' : 'text-gray-700 hover:bg-gray-100' }}">
-                {{ __('Dashboard') }}
-            </a>
-            <a href="{{ route('patients.index') }}"
-               class="block px-3 py-2.5 rounded-lg text-base font-medium transition
-                      {{ request()->routeIs('patients.index') ? 'bg-brand-50 text-brand-800' : 'text-gray-700 hover:bg-gray-100' }}">
-                {{ __('Patients') }}
-            </a>
-            <a href="{{ route('patients.create') }}"
-               class="block px-3 py-2.5 rounded-lg text-base font-medium transition
-                      {{ request()->routeIs('patients.create') ? 'bg-brand-50 text-brand-800' : 'text-gray-700 hover:bg-gray-100' }}">
-                {{ __('New Patient') }}
-            </a>
-            <a href="{{ route('patients.create') }}"
-               class="block px-3 py-2.5 rounded-lg text-base font-medium transition text-health-700 hover:bg-health-50">
-                + {{ __('New Screening') }}
-            </a>
-        </div>
-
-        <div class="px-4 py-3 border-t border-gray-200">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-9 h-9 rounded-full bg-brand-100 text-brand-800 flex items-center justify-center text-sm font-bold">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                </div>
-                <div>
-                    <p class="text-sm font-medium text-gray-800">{{ Auth::user()->name }}</p>
-                    <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
+        <!-- Panel footer: user + logout -->
+        <div class="shrink-0 border-t border-gray-100 px-3 py-4">
+            <div class="mb-3 flex items-center gap-3 px-1">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-800">{{ $initials }}</span>
+                <div class="min-w-0">
+                    <p class="truncate text-sm font-semibold text-gray-800">{{ $user->name }}</p>
+                    <p class="truncate text-xs text-gray-500">{{ $user->email }}</p>
                 </div>
             </div>
-            <a href="{{ route('profile.edit') }}" class="block px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition">
-                {{ __('Profile') }}
-            </a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="block w-full text-start px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition">
+                <button type="submit"
+                        class="flex w-full items-center justify-center gap-2 rounded-lg border border-danger-200 px-4 py-2.5 text-sm font-semibold text-danger-600 transition-colors duration-200 hover:bg-danger-50">
+                    <x-icon name="logout" class="h-4 w-4"/>
                     {{ __('Log Out') }}
                 </button>
             </form>
         </div>
-    </div>
-</nav>
+    </aside>
+</div>

@@ -19,6 +19,15 @@ Route::get('/dashboard', function () {
     return redirect()->route('dashboard.summary');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Language switcher (used by the navbar user menu)
+Route::get('/locale/{locale}', function (string $locale) {
+    if (in_array($locale, ['en', 'ur'], true)) {
+        session(['locale' => $locale]);
+    }
+
+    return redirect()->back();
+})->name('locale.switch');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
