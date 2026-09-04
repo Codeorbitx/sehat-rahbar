@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#047857">
+    <meta name="theme-color" content="#064e3b">
     <link rel="manifest" href="/manifest.json">
     <title>{{ config('app.name', 'Sehat Rahbar') }}</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -14,18 +14,18 @@
 <body class="font-sans antialiased bg-white text-gray-800">
 
     {{-- ── Top bar ── --}}
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <header class="bg-brand-900 border-b border-white/10 sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="{{ route('home') }}" class="flex items-center gap-2">
-                <img src="{{ asset('images/logo.png') }}" alt="Sehat Rahbar" class="h-9 w-9 object-contain">
-                <span class="text-base font-bold text-navy-900" translate="no">{{ config('app.name', 'Sehat Rahbar') }}</span>
+            <a href="{{ route('home') }}" class="flex items-center gap-3">
+                <img src="{{ asset('images/logo-white.png') }}" alt="Sehat Rahbar" class="h-12 w-auto object-contain">
+                <span class="text-base font-bold text-white" translate="no">{{ config('app.name', 'Sehat Rahbar') }}</span>
             </a>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-4">
                 @auth
-                    <a href="{{ route('dashboard') }}" class="btn-primary text-sm px-4 py-2">{{ __('Dashboard') }}</a>
+                    <a href="{{ route('dashboard') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-brand-800 shadow-sm transition-colors duration-200 hover:bg-brand-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300">{{ __('Dashboard') }}</a>
                 @else
-                    <a href="{{ route('login') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900 px-3 py-2 transition">{{ __('Login') }}</a>
-                    <a href="{{ route('register') }}" class="btn-primary text-sm px-4 py-2">{{ __('Register') }}</a>
+                    <a href="{{ route('login') }}" class="text-sm font-medium text-white hover:text-brand-100 px-3 py-2 transition-colors duration-200">{{ __('Login') }}</a>
+                    <a href="{{ route('register') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-brand-800 shadow-sm transition-colors duration-200 hover:bg-brand-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300">{{ __('Register') }}</a>
                 @endauth
             </div>
         </div>
@@ -221,9 +221,9 @@
     </section>
 
     {{-- ── Footer ── --}}
-    <footer class="bg-white border-t border-gray-200 py-6">
-        <div class="max-w-6xl mx-auto px-4 text-center text-xs text-gray-400">
-            <p>&copy; {{ date('Y') }} <span translate="no">{{ config('app.name', 'Sehat Rahbar') }}</span></p>
+    <footer class="bg-brand-900 border-t border-white/10 py-6">
+        <div class="max-w-6xl mx-auto px-4 text-center text-xs text-white/80">
+            <p>&copy; {{ date('Y') }} <span translate="no" class="font-semibold text-white">{{ config('app.name', 'Sehat Rahbar') }}</span></p>
             <p class="mt-1">{{ __('This is a decision-support tool, not a diagnosis. Clinical judgment should always guide final decisions.') }}</p>
         </div>
     </footer>

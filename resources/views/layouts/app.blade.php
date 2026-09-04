@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <meta name="theme-color" content="#047857">
+        <meta name="theme-color" content="#064e3b">
         <link rel="manifest" href="/manifest.json">
 
         <title>{{ config('app.name', 'Sehat Rahbar') }}</title>
@@ -48,9 +48,9 @@
             </main>
 
             <!-- Footer -->
-            <footer class="bg-white border-t border-gray-200 py-4 mt-auto">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-gray-400">
-                    <span translate="no">{{ config('app.name', 'Sehat Rahbar') }}</span> &mdash; {{ __('This is a decision-support tool, not a diagnosis. Clinical judgment should always guide final decisions.') }}
+            <footer class="bg-brand-900 border-t border-white/10 py-4 mt-auto">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-brand-200/80">
+                    <span translate="no" class="font-semibold text-white">{{ config('app.name', 'Sehat Rahbar') }}</span> &mdash; {{ __('This is a decision-support tool, not a diagnosis. Clinical judgment should always guide final decisions.') }}
                 </div>
             </footer>
         </div>

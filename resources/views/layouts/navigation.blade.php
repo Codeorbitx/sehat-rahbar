@@ -18,8 +18,8 @@
 
     // Shared class strings (kept identical across desktop/mobile for consistency).
     $navLink  = 'inline-flex items-center gap-1.5 border-b-2 px-3 text-sm font-medium transition-colors duration-200';
-    $navActive = 'border-brand-700 text-brand-800';
-    $navIdle   = 'border-transparent text-gray-600 hover:border-gray-300 hover:text-gray-900';
+    $navActive = 'border-brand-300 text-white';
+    $navIdle   = 'border-transparent text-brand-100 hover:border-brand-400 hover:text-white';
 
     $menuItem = 'flex w-full items-center gap-2.5 px-4 py-2 text-start text-sm font-medium text-gray-700 transition-colors duration-150 hover:bg-brand-50 hover:text-brand-800';
 
@@ -32,17 +32,17 @@
      @keydown.escape.window="open = false"
      x-effect="document.body.style.overflow = open ? 'hidden' : ''">
 
-    <nav class="sticky top-0 z-50 border-b border-gray-200 bg-white transition-[background-color,box-shadow,backdrop-filter] duration-300"
-         :class="scrolled ? 'bg-white/90 shadow-sm backdrop-blur-md' : ''">
+    <nav class="sticky top-0 z-50 border-b border-white/10 bg-brand-900 transition-[background-color,box-shadow,backdrop-filter] duration-300"
+         :class="scrolled ? 'bg-brand-900/90 shadow-lg shadow-brand-950/30 backdrop-blur-md' : ''">
 
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="flex h-16 items-center justify-between gap-3">
+            <div class="flex items-center justify-between gap-3 py-2 md:py-2.5">
 
                 <!-- Left: brand + primary navigation -->
                 <div class="flex min-w-0 items-center gap-7">
-                    <a href="{{ route('dashboard') }}" class="flex shrink-0 items-center gap-2.5" aria-label="{{ config('app.name', 'Sehat Rahbar') }}">
-                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'Sehat Rahbar') }}" class="h-9 w-9 object-contain">
-                        <span class="hidden text-base font-bold leading-none text-navy-900 sm:block" translate="no">{{ config('app.name', 'Sehat Rahbar') }}</span>
+                    <a href="{{ route('dashboard') }}" class="flex shrink-0 items-center gap-4" aria-label="{{ config('app.name', 'Sehat Rahbar') }}">
+                        <img src="{{ asset('images/logo-white.png') }}" alt="{{ config('app.name', 'Sehat Rahbar') }}" class="h-14 w-auto object-contain md:h-16">
+                        <span class="-mt-2 hidden text-lg font-bold leading-none text-white sm:block md:text-xl" translate="no">{{ config('app.name', 'Sehat Rahbar') }}</span>
                     </a>
 
                     <!-- Desktop nav links -->
@@ -66,14 +66,14 @@
                 <div class="flex shrink-0 items-center gap-2 sm:gap-3">
                     <!-- New screening (desktop / tablet) -->
                     <a href="{{ route('patients.create') }}" title="{{ __('New Screening') }}"
-                       class="hidden items-center gap-1.5 rounded-lg bg-health-700 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-health-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-health-500 sm:inline-flex">
+                       class="hidden items-center gap-1.5 rounded-lg bg-white px-3.5 py-2 text-sm font-semibold text-brand-800 shadow-sm transition-colors duration-200 hover:bg-brand-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 sm:inline-flex">
                         <x-icon name="plus" class="h-4 w-4"/>
                         <span>{{ __('New Screening') }}</span>
                     </a>
 
                     <!-- New screening — icon-only on very small screens -->
                     <a href="{{ route('patients.create') }}" title="{{ __('New Screening') }}" aria-label="{{ __('New Screening') }}"
-                       class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-health-700 text-white shadow-sm transition-colors duration-200 hover:bg-health-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-health-500 sm:hidden">
+                       class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white text-brand-800 shadow-sm transition-colors duration-200 hover:bg-brand-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 sm:hidden">
                         <x-icon name="plus" class="h-4 w-4"/>
                     </a>
 
@@ -81,10 +81,10 @@
                     <x-dropdown align="right" width="56">
                         <x-slot name="trigger">
                             <button type="button" aria-haspopup="menu"
-                                    class="flex items-center gap-2.5 rounded-full p-1 pe-2 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">
+                                    class="flex items-center gap-2.5 rounded-full p-1 pe-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300">
                                 <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-800">{{ $initials }}</span>
                                 <span class="hidden max-w-[10rem] truncate md:block">{{ $user->name }}</span>
-                                <x-icon name="chevron-down" class="hidden h-4 w-4 text-gray-400 md:block"/>
+                                <x-icon name="chevron-down" class="hidden h-4 w-4 text-brand-200 md:block"/>
                             </button>
                         </x-slot>
 
@@ -148,7 +148,7 @@
 
                     <!-- Hamburger (mobile / tablet) -->
                     <button type="button" @click="open = true" :aria-expanded="open ? 'true' : 'false'" aria-label="{{ __('Menu') }}"
-                            class="rounded-lg p-2 text-gray-500 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 lg:hidden">
+                            class="rounded-lg p-2 text-brand-100 transition-colors duration-200 hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 lg:hidden">
                         <x-icon name="menu" class="h-6 w-6"/>
                     </button>
                 </div>
@@ -175,7 +175,7 @@
         <!-- Panel header -->
         <div class="flex h-16 shrink-0 items-center justify-between border-b border-gray-100 px-4">
             <a href="{{ route('dashboard') }}" @click="open = false" class="flex items-center gap-2.5">
-                <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'Sehat Rahbar') }}" class="h-8 w-8 object-contain">
+                <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'Sehat Rahbar') }}" class="h-9 w-9 object-contain">
                 <span class="text-sm font-bold leading-none text-navy-900" translate="no">{{ config('app.name', 'Sehat Rahbar') }}</span>
             </a>
             <button type="button" @click="open = false" aria-label="{{ __('Close menu') }}"
