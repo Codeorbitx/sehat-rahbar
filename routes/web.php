@@ -9,14 +9,14 @@ use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     if (auth()->check()) {
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard.summary');
     }
 
-    return view('home');
+    return view('welcome');
 })->name('home');
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return redirect()->route('dashboard.summary');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

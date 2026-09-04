@@ -105,31 +105,31 @@ class ScreeningController extends Controller
 
         if ($systolic >= 160 || $diastolic >= 110) {
             $priority = 'high';
-            $reasons[] = 'Severe hypertension (BP >= 160/110)';
+            $reasons[] = 'شدید ہائی بلڈ پریشر';
         } elseif ($systolic >= 140 || $diastolic >= 90) {
             $priority = 'moderate';
-            $reasons[] = 'Elevated BP (>= 140/90)';
+            $reasons[] = 'بلند بلڈ پریشر';
         }
 
         if (!empty($data['severe_headache']) && !empty($data['vision_issues'])) {
             $priority = 'high';
-            $reasons[] = 'Severe headache with visual disturbance';
+            $reasons[] = 'شدید سر درد اور نظر میں کمی';
         }
 
         if (!empty($data['low_fetal_movement'])) {
             $priority = 'high';
-            $reasons[] = 'Reduced fetal movement reported';
+            $reasons[] = 'بچے کی حرکت میں کمی';
         }
 
         if (!empty($data['swelling']) && $priority === 'low') {
             $priority = 'moderate';
-            $reasons[] = 'Swelling reported';
+            $reasons[] = 'سوجن کی اطلاع';
         }
 
         if (empty($reasons)) {
-            $reasons[] = 'No concerning signs reported';
+            $reasons[] = 'کوئی پریشان کن علامت نہیں ملی';
         }
 
-        return [$priority, implode('; ', $reasons)];
+        return [$priority, implode('؛ ', $reasons)];
     }
 }

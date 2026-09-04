@@ -8,7 +8,7 @@ class PatientController extends Controller
 {
     public function index()
     {
-        $patients = \App\Models\Patient::latest()->get();
+        $patients = Patient::with(['screenings' => fn ($q) => $q->latest()->with('triageResult')])->latest()->get();
 
         return view('patients.index', compact('patients'));
     }

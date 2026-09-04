@@ -1,50 +1,53 @@
 <x-app-layout>
-    <div class="min-h-screen bg-gray-50 py-8 flex justify-center">
-        <div class="w-full max-w-md mx-4 bg-white shadow-md rounded-xl border border-gray-100 overflow-hidden">
-            <div class="flex flex-col items-center pt-6 pb-2">
-                <img src="{{ asset('images/logo.png') }}" alt="Sehat Rahbar" class="w-12 h-auto object-contain">
-                <h2 class="mt-2 text-lg font-medium text-gray-800">New Patient</h2>
-            </div>
+    <x-slot name="header">
+        <h2 class="text-xl font-bold text-navy-900">{{ __('New Patient') }}</h2>
+    </x-slot>
 
-            <div class="px-6 pb-6">
+    <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="card">
+            <div class="card-body">
                 @if (session('success'))
-                    <div class="mb-4 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2">
+                    <div class="mb-4 text-sm text-health-700 bg-health-50 border border-health-200 rounded-lg px-4 py-3">
                         {{ session('success') }}
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('patients.store') }}" class="space-y-4">
+                <form method="POST" action="{{ route('patients.store') }}" class="space-y-5">
                     @csrf
 
                     <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
-                        <input type="text" name="name" id="name" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
-                        @error('name') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                        <label for="name" class="field-label">{{ __('Full Name') }} <span class="text-danger-500">*</span></label>
+                        <input type="text" name="name" id="name" value="{{ old('name') }}" required
+                            class="field-input" placeholder="{{ __('Full Name') }}">
+                        @error('name') <p class="field-error">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
-                        <label for="age" class="block text-sm font-medium text-gray-700">Age</label>
-                        <input type="number" name="age" id="age"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
+                        <label for="age" class="field-label">{{ __('Age') }}</label>
+                        <input type="number" name="age" id="age" value="{{ old('age') }}"
+                            class="field-input" placeholder="{{ __('Age') }}">
                     </div>
 
                     <div>
-                        <label for="gestational_age_weeks" class="block text-sm font-medium text-gray-700">Gestational Age (weeks)</label>
-                        <input type="number" name="gestational_age_weeks" id="gestational_age_weeks"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
+                        <label for="gestational_age_weeks" class="field-label">{{ __('Gestational Age (weeks)') }}</label>
+                        <input type="number" name="gestational_age_weeks" id="gestational_age_weeks" value="{{ old('gestational_age_weeks') }}"
+                            class="field-input" placeholder="{{ __('Gestational Age (weeks)') }}">
                     </div>
 
                     <div>
-                        <label for="contact_number" class="block text-sm font-medium text-gray-700">Contact Number</label>
-                        <input type="text" name="contact_number" id="contact_number"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
+                        <label for="contact_number" class="field-label">{{ __('Contact Number') }}</label>
+                        <input type="text" name="contact_number" id="contact_number" value="{{ old('contact_number') }}"
+                            class="field-input" dir="ltr" placeholder="{{ __('Contact Number') }}">
                     </div>
 
-                    <button type="submit"
-                        class="w-full inline-flex justify-center py-2 px-4 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold rounded-md transition">
-                        Register Patient
-                    </button>
+                    <div class="flex gap-3 pt-2">
+                        <button type="submit" class="btn-success flex-1 justify-center py-2.5">
+                            {{ __('Save Patient') }}
+                        </button>
+                        <a href="{{ route('patients.index') }}" class="btn-secondary flex-1 justify-center py-2.5">
+                            {{ __('Cancel') }}
+                        </a>
+                    </div>
                 </form>
             </div>
         </div>

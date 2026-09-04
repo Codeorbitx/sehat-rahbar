@@ -1,8 +1,144 @@
+/* Urdu / Noto Nastaliq Urdu from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Hide Alpine components until Alpine initializes (e.g. the offline banner). */
+/* Hide Alpine components until Alpine initializes */
 [x-cloak] {
     display: none !important;
+}
+
+/* ── Urdu / RTL text handling ──
+   The application layout stays LTR: navbar, logo, cards, forms and
+   buttons always flow left-to-right. Urdu support only affects the
+   text itself — never the positioning of the surrounding UI. */
+[dir="rtl"] {
+    font-family: 'Noto Nastaliq Urdu', 'Figtree', system-ui, sans-serif;
+    text-align: right;
+}
+
+/* Urdu text reads right-to-left inside its own element while the page
+   layout remains LTR; English text keeps its normal LTR flow in the
+   very same elements. */
+p, h1, h2, h3, h4, h5, h6, li, dd, dt, blockquote, figcaption, label, th, td {
+    unicode-bidi: plaintext;
+}
+
+/* ── Healthcare design tokens ── */
+@layer base {
+    /* Calm, professional body defaults */
+    body {
+        @apply bg-gray-50 text-gray-800 antialiased;
+    }
+
+    /* Headings hierarchy */
+    h1 { @apply text-2xl font-bold text-gray-900 tracking-tight; }
+    h2 { @apply text-xl font-semibold text-gray-900; }
+    h3 { @apply text-lg font-semibold text-gray-800; }
+}
+
+@layer components {
+    /* ── Status badges ── */
+    .badge-low {
+        @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide
+               bg-health-100 text-health-800;
+    }
+    .badge-moderate {
+        @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide
+               bg-warn-100 text-warn-700;
+    }
+    .badge-high {
+        @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide
+               bg-danger-100 text-danger-700;
+    }
+
+    /* ── Stat card ── */
+    .stat-card {
+        @apply bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex flex-col gap-1;
+    }
+    .stat-card-label {
+        @apply text-sm font-medium text-gray-500;
+    }
+    .stat-card-value {
+        @apply text-3xl font-bold;
+    }
+
+    /* ── Section card (generic white container) ── */
+    .card {
+        @apply bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden;
+    }
+    .card-header {
+        @apply px-6 py-4 border-b border-gray-100;
+    }
+    .card-body {
+        @apply px-6 py-5;
+    }
+
+    /* ── Primary button ── */
+    .btn-primary {
+        @apply inline-flex items-center justify-center gap-2 px-5 py-2.5
+               bg-brand-800 hover:bg-brand-900 text-white text-sm font-semibold
+               rounded-lg shadow-sm transition ease-in-out duration-150
+               focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2;
+    }
+    .btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 px-5 py-2.5
+               bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold
+               border border-gray-300 rounded-lg shadow-sm transition ease-in-out duration-150
+               focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2;
+    }
+    .btn-success {
+        @apply inline-flex items-center justify-center gap-2 px-5 py-2.5
+               bg-health-700 hover:bg-health-800 text-white text-sm font-semibold
+               rounded-lg shadow-sm transition ease-in-out duration-150
+               focus:outline-none focus:ring-2 focus:ring-health-500 focus:ring-offset-2;
+    }
+    .btn-danger {
+        @apply inline-flex items-center justify-center gap-2 px-5 py-2.5
+               bg-danger-600 hover:bg-danger-700 text-white text-sm font-semibold
+               rounded-lg shadow-sm transition ease-in-out duration-150
+               focus:outline-none focus:ring-2 focus:ring-danger-500 focus:ring-offset-2;
+    }
+
+    /* ── Form field ── */
+    .field-label {
+        @apply block text-sm font-medium text-gray-700 mb-1;
+    }
+    .field-input {
+        @apply block w-full rounded-lg border-gray-300 shadow-sm
+               focus:border-brand-500 focus:ring-brand-500 text-base;
+    }
+    .field-error {
+        @apply text-xs text-danger-600 mt-1;
+    }
+
+    /* ── Table ── */
+    .data-table {
+        @apply min-w-full text-sm;
+    }
+    .data-table thead {
+        @apply bg-gray-50 border-b border-gray-200;
+    }
+    .data-table th {
+        @apply px-5 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 text-start;
+    }
+    .data-table td {
+        @apply px-5 py-4 text-gray-700;
+    }
+    .data-table tbody tr {
+        @apply border-b border-gray-100 hover:bg-brand-50/40 transition;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+        @apply px-6 py-16 text-center;
+    }
+    .empty-state-text {
+        @apply text-sm text-gray-500;
+    }
+    .empty-state-link {
+        @apply mt-3 inline-block text-sm font-semibold text-brand-700 hover:text-brand-800;
+    }
 }

@@ -4,26 +4,22 @@
     </div>
 
     @if (session('status') == 'verification-link-sent')
-        <div class="mb-4 font-medium text-sm text-green-600">
+        <div class="mb-4 font-medium text-sm text-health-600 bg-health-50 border border-health-200 rounded-lg px-3 py-2">
             {{ __('A new verification link has been sent to the email address you provided during registration.') }}
         </div>
     @endif
 
-    <div class="mt-4 flex items-center justify-between">
+    <div class="mt-4 flex items-center justify-between gap-4">
         <form method="POST" action="{{ route('verification.send') }}">
             @csrf
-
-            <div>
-                <x-primary-button>
-                    {{ __('Resend Verification Email') }}
-                </x-primary-button>
-            </div>
+            <x-primary-button>
+                {{ __('Resend Verification Email') }}
+            </x-primary-button>
         </form>
 
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-
-            <button type="submit" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <button type="submit" class="text-sm text-gray-500 hover:text-gray-700 font-medium">
                 {{ __('Log Out') }}
             </button>
         </form>
